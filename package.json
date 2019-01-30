@@ -1,0 +1,11 @@
+{
+  "name": "eskey-srv",
+  "version": "1.0.0",
+  "description": "Micro http server with object notation routing",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "kolodziejczak-sz",
+  "license": "MIT"
+}
