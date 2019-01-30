@@ -1,14 +1,14 @@
 import * as http from 'http';
 import { parse as urlParse, URLSearchParams } from 'url';
 
+export interface ServerResponse extends http.ServerResponse {}
+
 export interface ClientRequest extends http.IncomingMessage {
   queryParams: URLSearchParams,
   params: {
-    [key: string]:string
+    [key: string]: string
   },
 }
-
-export interface ServerResponse extends http.ServerResponse {}
 
 export type Handler = (req: ClientRequest, res: ServerResponse) => any;
 

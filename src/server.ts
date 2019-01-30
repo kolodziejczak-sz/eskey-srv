@@ -9,13 +9,13 @@ export default class EskeyServer {
     private server: http.Server = http.createServer()
     ) {}
 
-  public onerror = function(req: ClientRequest, res: ServerResponse, err: any): void  {
+  public onError = function(req: ClientRequest, res: ServerResponse, err: any): void  {
     res.statusCode = 500;
     res.statusMessage = http.STATUS_CODES[500];
     res.end();
   }
 
-  public onnotfound = function(req: ClientRequest, res: ServerResponse): void {
+  public onNotFound = function(req: ClientRequest, res: ServerResponse): void {
     res.statusCode = 404;
     res.statusMessage = http.STATUS_CODES[404];
     res.end();
@@ -32,7 +32,7 @@ export default class EskeyServer {
         this.handleRequest(req, res);
       }
       catch(err) {
-        this.onerror(req, res, err);
+        this.onError(req, res, err);
       }
     });
     this.server.listen.apply(this.server, args);
@@ -55,22 +55,24 @@ export default class EskeyServer {
           return;
         }
         if(route.use) {
-          if([].concat(route.use)
-               .some((fn: Handler) => (fn(req, res), res.finished))
-          ) return;
+          let arr=route.use,len=arr.length,i=0;
+          const next = () => res.finished || i < len && arr[i++](req, res, next);
+          if(next() || res.finished) {
+            return;
+          }
         }
         if((route.children || []).length > 0) {
           processRoutes(route.children, route.path === '' ? urlParts : tail)
         }
       }
-      this.onnotfound(req, res);
+      this.onNotFound(req, res);
     }
 
     const matchRoute = (routes: Route[], urlPart: string): Route => {
       let isPathOk, isMethodOk, isParam;
 
       for(let route of routes) {
-        isMethodOk = (!route.method || (route.method === req.method));
+        isMethodOk = (!route.method || route.method === req.method);
         if(!isMethodOk) {
           continue;
         }
