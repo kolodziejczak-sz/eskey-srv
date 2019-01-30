@@ -55,7 +55,7 @@ export default class EskeyServer {
           return;
         }
         if(route.use) {
-          let arr=route.use,len=arr.length,i=0;
+          let arr=[].concat(route.use),len=arr.length,i=0;
           const next = () => res.finished || i < len && arr[i++](req, res, next);
           if(next() || res.finished) {
             return;
