@@ -1,5 +1,7 @@
 # eskey-srv
-Nodejs micro http server with object notation routing. No dependencies are required.
+Nodejs micro http server with object notation routing. No extra dependencies are required.
+
+Hello world example:
 
 ```javascript
 const EskeyServer = require('./lib/server');
@@ -14,7 +16,7 @@ app.listen(port, () => process.stdout.write('Server is listening'));
 Routing is based on provided array of routes. Interface of single route presented below:
 
 ```typescript
-export interface Route {
+interface Route {
   children?: Route[] 
   use?: Handler | Handler[],
   method?: string,
@@ -26,15 +28,19 @@ export interface Route {
 All properties are optional: more properties filled -> the match will be more precise.
 
 The server extends ClientRequest with params and queryParams.
+All params should be preceded by colon.
 
 ```typescript
-export interface ClientRequest extends http.IncomingMessage {
+interface ServerResponse extends http.ServerResponse {}
+
+interface ClientRequest extends http.IncomingMessage {
   queryParams: URLSearchParams,
   params: {
-    [key: string]:string
+    [key: string]: string
   },
 }
-export interface ServerResponse extends http.ServerResponse {}
+
+type Handler = (req: ClientRequest, res: ServerResponse) => any;
 ```
 
 With that being said below is more advanced example:
@@ -63,3 +69,6 @@ const httpServer = http.createServer();
 const app = new EskeyServer(appRoutes, httpServer)
   .listen(8080, () => process.stdout.write('Server is listening'))
 ```
+
+Nesting paths needs to be accomplished by nesting Route objects with children property. Route.path can't have slash separator.
+Route handlers are executed sequentially until ServerResponse is finish.
