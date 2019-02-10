@@ -68,7 +68,7 @@ export default class EskeyServer {
       this.onNotFound(req, res);
     }
 
-    const matchRoute = (routes: Route[], urlPart: string): Route => {
+    const matchRoute = (routes: Route[], urlPart: string = ''): Route => {
       let isPathOk, isMethodOk, isParam;
 
       for(let route of routes) {
