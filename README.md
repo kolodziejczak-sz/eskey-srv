@@ -21,6 +21,7 @@ interface Route {
   use?: Handler | Handler[],
   method?: string,
   path?: string,
+  pathMatchFull?: boolean,
   redirectTo?: string,
 }
 ```
@@ -62,7 +63,8 @@ const appRoutes: Route[] = [
       }
     ]
   },
-  { path: '', use: (req, res) => res.end('Hello world') }
+  { path: '', pathMatchFull: true, use: (req, res) => res.end('Hello world') }
+  { use: (_, res) => (res.statusCode=404, res.end()) }
 ]
 
 const httpServer = http.createServer();
