@@ -49,23 +49,30 @@ export default class EskeyServer {
     const processRoutes = (routes: Route[], urlParts: string[]): void => {
       const [ head, ...tail ] = urlParts;
       const route = matchRoute(routes, head);
-      if(route) {
-        if(route.redirectTo) {
-          this.redirect(res, route.redirectTo);
-          return;
-        }
-        if(route.use) {
-          let arr=[].concat(route.use),len=arr.length,i=0;
-          const next = () => res.finished || i < len && arr[i++](req, res, next);
-          if(next() || res.finished) {
-            return;
-          }
-        }
-        if((route.children || []).length > 0) {
-          processRoutes(route.children, route.path === '' ? urlParts : tail)
-        }
+      if(!route) {
+        this.onNotFound(req, res);
       }
-      this.onNotFound(req, res);
+      else if(route.redirectTo) {
+        this.redirect(res, route.redirectTo);
+      }
+      else if(route.use) {
+        let arr=[].concat(route.use),len=arr.length,i=0;
+        const next = () => {
+          if(res.finished) return true;
+          if(i < len) return arr[i++](req, res, next);
+          if((route.children || []).length > 0) {
+            processRoutes(route.children, route.path ? tail : urlParts)
+          } else {
+            this.onNotFound(req, res);
+          }
+        };
+        next();
+      }
+      else if((route.children || []).length > 0) {
+        processRoutes(route.children, route.path ? tail : urlParts)
+      } else {
+        this.onNotFound(req, res);
+      }
     }
 
     const matchRoute = (routes: Route[], urlPart: string = ''): Route => {
