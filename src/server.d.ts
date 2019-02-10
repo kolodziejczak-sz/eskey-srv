@@ -17,5 +17,6 @@ export interface Route {
   use?: Handler | Handler[],
   method?: string,
   path?: string,
+  pathMatchFull? : boolean,
   redirectTo?: string,
 }

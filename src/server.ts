@@ -81,7 +81,8 @@ export default class EskeyServer {
           req.params[route.path.substring(1)] = urlPart;
           return route;
         }
-        isPathOk = (!route.path || route.path === urlPart)
+        isPathOk = route.pathMatchFull ? (route.path === urlPart) 
+                                       : (!route.path || route.path === urlPart);
         if(isPathOk) {
           return route
         }
